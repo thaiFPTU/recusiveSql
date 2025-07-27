@@ -4,10 +4,8 @@ import com.example.demo.common.BaseResponse;
 import com.example.demo.service.EmployeeService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @AllArgsConstructor
@@ -17,5 +15,9 @@ public class EmployeeController {
     @GetMapping("/getAllEmployeeUnderById/{employeeId}")
     public ResponseEntity<?> getAllEmployeeUnderById(@PathVariable Long employeeId) {
             return ResponseEntity.ok().body(employeeService.findAllEmloyeeUnderById(employeeId));
+    }
+    @PostMapping("/upload")
+    public ResponseEntity<?> importEmployeeFromExcel(@RequestParam("file") MultipartFile file) {
+        return ResponseEntity.ok().body(employeeService.importEmployeeFromExcel(file));
     }
 }
