@@ -8,10 +8,12 @@ import com.example.demo.model.Employee;
 import com.example.demo.repository.EmployeeRepository;
 import com.example.demo.service.EmployeeService;
 import com.example.demo.ultils.ExcelHelper;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -21,7 +23,7 @@ public class EmployeeServiceimpl implements EmployeeService {
     private final EmployeeRepository employeeRepository;
 
     @Override
-    public BaseResponse<?> findAllEmloyeeUnderById(Long employeeId) {
+    public BaseResponse<?> findAllEmloyeePathById(Long employeeId) {
         if (employeeId == null) {
             return new BaseResponse<>(
                     400,
@@ -68,4 +70,27 @@ public class EmployeeServiceimpl implements EmployeeService {
                 employeeList
         );
     }
+
+    @Override
+    public BaseResponse<?> exportEmployeePathToExcel(Long employeeId, HttpServletResponse response) throws IOException {
+        if (employeeId == null) {
+            return new BaseResponse<>(
+                    400,
+                    EmployeeConstant.EMPLOYEE_ID_NULL,
+                    null
+            );
+        }
+        List<EmployeeResponse> employeeResponseList = employeeRepository.findAllEmployeeInPath(employeeId);
+        if (employeeResponseList.isEmpty()) {
+            return new BaseResponse<>(
+                    404,
+                    EmployeeConstant.EMPLOYEE_LIST_EMPTY,
+                    null
+            );
+        }
+        ExcelHelper excelHelper = new ExcelHelper();
+        excelHelper.convertEmployeeListToExcel(employeeResponseList,response);
+        return new BaseResponse<>(200, EmployeeConstant.EMPLOYEE_LIST_SUCCESS, employeeResponseList);
+    }
+
 }
